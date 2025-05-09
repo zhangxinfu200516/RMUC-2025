@@ -165,16 +165,17 @@ protected:
     Enum_Booster_Control_Type Booster_Control_Type = Booster_Control_Type_CEASEFIRE;
     Enum_Friction_Control_Type Friction_Control_Type = Friction_Control_Type_DISABLE;
     //摩擦轮角速度
-    int16_t Fric_High_Rpm = 4975;//5025;//5075;
-    int16_t Fric_Low_Rpm = 4825;//4875;//4925;
-    int16_t Fric_Transform_Rpm = -154;
+    int16_t Fric_High_Rpm = 4975;
+    int16_t Fric_Low_Rpm = 4825;//
+    int16_t Fric_Transform_Rpm = -159;
     //子弹实际速度
     float Referee_Bullet_Velocity = 0.0f; 
     float Pre_Referee_Bullet_Velocity = 0.0f;
     Enum_Referee_Bullet_Velocity_Updata_Status Referee_Bullet_Velocity_Updata_Status = Referee_Bullet_Velocity_Updata_Status_DISABLE;
     int16_t Projectile_Allowance_42mm;
-    //沈阳：5025 5175
+    //沈阳：5025 5175 
 	//速度
+    //RMUC 4975 4825
     float Friction_Omega = 0.0f;//暂时用不到
     //拨弹盘实际的目标速度, 一圈八发子弹
     float Driver_Omega = -2.0f * PI;

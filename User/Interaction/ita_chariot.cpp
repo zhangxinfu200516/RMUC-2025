@@ -36,7 +36,7 @@ void Class_Chariot::Init(float __DR16_Dead_Zone)
 
     // 裁判系统
     Referee.Init(&huart1);
-
+    Chassis.Supercap.Referee = &Referee;
     // 底盘
     Chassis.Referee = &Referee;
     Chassis.Init(Chassis_Velocity_Max, Chassis_Velocity_Max);
@@ -391,10 +391,6 @@ void Class_Chariot::Control_Chassis()
                         transform_pitch_offest += VT13_Mouse_Pitch_Angle_Resolution * Mouse_Pitch_k;
                         Gimbal.Set_Transfrom_Pitch_IMU_Angle(transform_pitch_offest);
                     }
-                    // else if (DR16.Get_Keyboard_Key_C() == DR16_Key_Status_TRIG_FREE_PRESSED)
-                    // {
-                    //     Gimbal.Set_Transfrom_Pitch_IMU_Angle(transform_pitch_offest);
-                    // }
                 }
                 break;
                 case 0:
@@ -415,40 +411,6 @@ void Class_Chariot::Control_Chassis()
                     UI_Radar_Control_Type = MiniPC.Get_Radar_Control_Type();
                 }
 
-            }
-            else if (DR16.Get_Keyboard_Key_G() == DR16_Key_Status_TRIG_FREE_PRESSED)
-            {
-                if (UI_Radar_Target == Radar_Target_Pos_Outpost)
-                    UI_Radar_Target = Radar_Target_Pos_Base;
-                else
-                    UI_Radar_Target = Radar_Target_Pos_Outpost;
-
-                MiniPC.Set_Radar_Target(UI_Radar_Target);
-            }
-            else if (DR16.Get_Keyboard_Key_X() == DR16_Key_Status_TRIG_FREE_PRESSED)
-            {
-                switch (UI_Radar_Target)
-                {
-                case Radar_Target_Pos_Outpost:
-                {
-                    if (UI_Radar_Target_Pos != Radar_Target_Pos_Outpost_B)
-                        UI_Radar_Target_Pos = Radar_Target_Pos_Outpost_B;
-                    else
-                        UI_Radar_Target_Pos = Radar_Target_Pos_Outpost_A;
-                }
-                break;
-                case Radar_Target_Pos_Base:
-                {
-                    if(UI_Radar_Target_Pos == Radar_Target_Pos_Outpost_A)
-                        UI_Radar_Target_Pos = Radar_Target_Pos_Outpost_B;
-                    else if(UI_Radar_Target_Pos == Radar_Target_Pos_Outpost_B)
-                        UI_Radar_Target_Pos = Radar_Target_Pos_C;
-                    else if(UI_Radar_Target_Pos == Radar_Target_Pos_C)
-                        UI_Radar_Target_Pos = Radar_Target_Pos_Outpost_A;
-                }
-                break;
-                }
-                MiniPC.Set_Radar_Target_Outpost(UI_Radar_Target_Pos);
             }
         }
         break;
@@ -501,14 +463,41 @@ void Class_Chariot::Control_Chassis()
         break;
         }
 
-        // if(DR16.Get_Keyboard_Key_Z() == DR16_Key_Status_PRESSED)
-        // {
-        //     Chassis.Supercap.Get_Supercap_Control_Status(Supercap_Control_Status_ENABLE);
-        // }
-        // if(DR16.Get_Keyboard_Key_X() == DR16_Key_Status_PRESSED)
-        // {
-        //     Chassis.Supercap.Get_Supercap_Control_Status(Supercap_Control_Status_DISABLE);
-        // }
+        if (DR16.Get_Keyboard_Key_G() == DR16_Key_Status_TRIG_FREE_PRESSED)
+        {
+            if (UI_Radar_Target == Radar_Target_Pos_Outpost)
+                UI_Radar_Target = Radar_Target_Pos_Base;
+            else
+                UI_Radar_Target = Radar_Target_Pos_Outpost;
+
+            MiniPC.Set_Radar_Target(UI_Radar_Target);
+        }
+        
+        if (DR16.Get_Keyboard_Key_X() == DR16_Key_Status_TRIG_FREE_PRESSED)
+        {
+            switch (UI_Radar_Target)
+            {
+            case Radar_Target_Pos_Outpost:
+            {
+                if (UI_Radar_Target_Pos != Radar_Target_Pos_Outpost_B)
+                    UI_Radar_Target_Pos = Radar_Target_Pos_Outpost_B;
+                else
+                    UI_Radar_Target_Pos = Radar_Target_Pos_Outpost_A;
+            }
+            break;
+            case Radar_Target_Pos_Base:
+            {
+                if (UI_Radar_Target_Pos == Radar_Target_Pos_Outpost_A)
+                    UI_Radar_Target_Pos = Radar_Target_Pos_Outpost_B;
+                else if (UI_Radar_Target_Pos == Radar_Target_Pos_Outpost_B)
+                    UI_Radar_Target_Pos = Radar_Target_Pos_C;
+                else if (UI_Radar_Target_Pos == Radar_Target_Pos_C)
+                    UI_Radar_Target_Pos = Radar_Target_Pos_Outpost_A;
+            }
+            break;
+            }
+            MiniPC.Set_Radar_Target_Outpost(UI_Radar_Target_Pos);
+        }
     }
 #elif defined(USE_VT13)
      float vt13_l_x, vt13_l_y;    
@@ -1013,11 +1002,11 @@ void Class_Chariot::Control_Image()
 
         if(DR16.Get_Keyboard_Key_V() == DR16_Key_Status_PRESSED)
         {
-            K = 0.008f;
+            K = 0.001f;
         }
         else if(DR16.Get_Keyboard_Key_B() == DR16_Key_Status_PRESSED)
         {
-            K= -0.008f;
+            K= -0.001f;
         }
         else
         {
@@ -1446,7 +1435,7 @@ void Class_Chariot::Chariot_Referee_UI_Tx_Callback(Enum_Referee_UI_Refresh_Statu
         }
 
         Referee.Referee_UI_Draw_Float_Graphic_5(Referee.Get_ID(),Referee_UI_Three,0,0x0F,Graphic_Color_GREEN,20,5,500/2+800+150, 400+410,Pitch_IMU_Angle,Referee_UI_CHANGE);
-
+        //Referee.Referee_UI_Draw_Float_Graphic_5(Referee.Get_ID(),Referee_UI_Three,0,0x0F,Graphic_Color_GREEN,20,5,500/2+800+150, 400+410,Chassis.Supercap.Totol_Energy,Referee_UI_CHANGE);
         if(UI_Radar_Target == Radar_Target_Pos_Outpost)
         {
             Referee.Referee_UI_Draw_String(5, Referee.Get_ID(), Referee_UI_Zero, 0, 0x0C , Graphic_Color_PURPLE, 20, 5, 960 * 2 - 250,810, "Outpost", (sizeof("Outpost") - 1), Referee_UI_CHANGE);
@@ -1593,13 +1582,6 @@ void Class_Chariot::TIM_Calculate_PeriodElapsedCallback()
         //底盘给舵小板发送最大功率
         //CAN_Chassis_Tx_Max_Power_Callback();
         //超电使用策略
-        if(Referee.Get_Level() == 1){
-            Chassis.Supercap.Set_Referee_MaxPower(55.0f);
-        }
-        else{
-            Chassis.Supercap.Set_Referee_MaxPower(Referee.Get_Chassis_Power_Max());
-        }
-        Chassis.Supercap.Set_Referee_BufferPower(Referee.Get_Chassis_Energy_Buffer());
         if(Supercap_Control_Status == Supercap_Control_Status_ENABLE)
         {
             Chassis.Supercap.Set_Supercap_Usage_Stratage(Supercap_Usage_Stratage_Supercap_BufferPower);

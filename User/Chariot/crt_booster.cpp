@@ -341,7 +341,7 @@ void Class_Booster::Output()
     // 控制摩擦轮
     if (Friction_Control_Type != Friction_Control_Type_DISABLE)
     {
-         Fric[0].Set_Target_Omega_Rpm((Fric_High_Rpm + Fric_Transform_Rpm));
+        Fric[0].Set_Target_Omega_Rpm((Fric_High_Rpm + Fric_Transform_Rpm));
         Fric[1].Set_Target_Omega_Rpm(-(Fric_High_Rpm + Fric_Transform_Rpm));
         Fric[2].Set_Target_Omega_Rpm(-(Fric_Low_Rpm + Fric_Transform_Rpm));
         Fric[3].Set_Target_Omega_Rpm((Fric_Low_Rpm + Fric_Transform_Rpm));
@@ -380,11 +380,11 @@ void Class_Booster::TIM_Adjust_Bullet_Velocity_PeriodElapsedCallback()
             }
             else if (Referee_Bullet_Velocity >= 15.9f && Referee_Bullet_Velocity < 16.0f)
             {
-                 Fric_Transform_Rpm -= (int16_t)(150.0f * fabs(Referee_Bullet_Velocity - 15.9f));
+                 Fric_Transform_Rpm -= (int16_t)(100.0f * fabs(Referee_Bullet_Velocity - 15.9f));
             }
             else if(Referee_Bullet_Velocity <= 15.75f)
             {
-                Fric_Transform_Rpm += (int16_t)(100.0f * fabs(Referee_Bullet_Velocity - 15.75f));
+                Fric_Transform_Rpm += (int16_t)(125.0f * fabs(Referee_Bullet_Velocity - 15.75f));
             }
         }
         break;
