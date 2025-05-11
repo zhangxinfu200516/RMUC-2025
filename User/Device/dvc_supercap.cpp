@@ -271,10 +271,10 @@ void Class_Supercap::Use_SuperCap_Strategy()
             {
             case 0://正常 ：Referee_BufferPower !< 25J
             {
-                Referee_BufferPower_Output = 1.0f * (Referee_BufferPower - 30.0f);
+                Referee_BufferPower_Output = 1.0f * (Referee_BufferPower - 40.0f);
                 Math_Constrain(&Referee_BufferPower_Output, -30.0f, 20.0f);
                 //Referee_BufferPower_Output = 0.0f;
-                if(Referee_BufferPower < 15.0f)
+                if(Referee_BufferPower < 25.0f)
                 {
                     fsm.Set_Status(1);
                 }
@@ -297,7 +297,7 @@ void Class_Supercap::Use_SuperCap_Strategy()
         case Supercap_Usage_Stratage_Supercap_BufferPower:
         {
             Supercap_BufferPower_Output = Data.Supercap_Buffer_Power;
-            Supercap_LimitBufferPower_Output = 0.5f * (Referee_BufferPower - 30.0f);
+            Supercap_LimitBufferPower_Output = 0.5f * (Referee_BufferPower - 40.0f);
             Math_Constrain(&Supercap_LimitBufferPower_Output,0.0f,15.0f);
             //Supercap_LimitBufferPower_Output = 0.0f;
             Set_PowerLimit_Type(PowerLimit_Type_Supercap_BufferPower);
@@ -307,7 +307,7 @@ void Class_Supercap::Use_SuperCap_Strategy()
     }
     else
     {
-        Referee_BufferPower_Output = 1.0f * (Referee_BufferPower - 30.0f);
+        Referee_BufferPower_Output = 1.0f * (Referee_BufferPower - 40.0f);
         //Referee_BufferPower_Output = 0.0f;
         Math_Constrain(&Referee_BufferPower_Output, -30.0f, 20.0f);
         Set_PowerLimit_Type(PowerLimit_Type_Referee_BufferPower);

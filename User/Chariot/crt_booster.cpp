@@ -368,23 +368,24 @@ void Class_Booster::TIM_Adjust_Bullet_Velocity_PeriodElapsedCallback()
             Referee_Bullet_Velocity_Updata_Status = Referee_Bullet_Velocity_Updata_Status_DISABLE;
         }
 
-        Pre_Referee_Bullet_Velocity = Referee_Bullet_Velocity;
-
         switch (Referee_Bullet_Velocity_Updata_Status)
         {
         case Referee_Bullet_Velocity_Updata_Status_ENABLE:
         {
-            if(Referee_Bullet_Velocity >= 16.0f)
+            if (fabs(Referee_Bullet_Velocity - Pre_Referee_Bullet_Velocity) <= 0.3f)
             {
-                Fric_Transform_Rpm -= (int16_t)(300.0f * fabs(Referee_Bullet_Velocity - 16.0f));
-            }
-            else if (Referee_Bullet_Velocity >= 15.9f && Referee_Bullet_Velocity < 16.0f)
-            {
-                 Fric_Transform_Rpm -= (int16_t)(100.0f * fabs(Referee_Bullet_Velocity - 15.9f));
-            }
-            else if(Referee_Bullet_Velocity <= 15.75f)
-            {
-                Fric_Transform_Rpm += (int16_t)(125.0f * fabs(Referee_Bullet_Velocity - 15.75f));
+                if (Referee_Bullet_Velocity >= 16.0f)
+                {
+                    Fric_Transform_Rpm -= (int16_t)(300.0f * fabs(Referee_Bullet_Velocity - 16.0f));
+                }
+                else if (Referee_Bullet_Velocity >= 15.9f && Referee_Bullet_Velocity < 16.0f)
+                {
+                    Fric_Transform_Rpm -= (int16_t)(100.0f * fabs(Referee_Bullet_Velocity - 15.9f));
+                }
+                else if (Referee_Bullet_Velocity <= 15.75f)
+                {
+                    Fric_Transform_Rpm += (int16_t)(100.0f * fabs(Referee_Bullet_Velocity - 15.75f));
+                }
             }
         }
         break;
@@ -394,6 +395,9 @@ void Class_Booster::TIM_Adjust_Bullet_Velocity_PeriodElapsedCallback()
         }
         break;
         }
+
+        Pre_Referee_Bullet_Velocity = Referee_Bullet_Velocity;
+
     // if (Pre_Referee_Bullet_Velocity != Referee_Bullet_Velocity)
     // {
     //     Referee_Bullet_Velocity_Updata_Status = Referee_Bullet_Velocity_Updata_Status_ENABLE;

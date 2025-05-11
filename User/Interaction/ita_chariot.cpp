@@ -400,17 +400,6 @@ void Class_Chariot::Control_Chassis()
                 break;
                 }
 
-                //切换雷达辅助模式
-                if(DR16.Get_Keyboard_Key_Shift() == DR16_Key_Status_TRIG_FREE_PRESSED)
-                {
-                    if(MiniPC.Get_Radar_Control_Type() == Radar_Control_Type_Person)
-                        MiniPC.Set_Radar_Control_Type(Radar_Control_Type_UWB);
-                    else
-                        MiniPC.Set_Radar_Control_Type(Radar_Control_Type_Person);
-                    
-                    UI_Radar_Control_Type = MiniPC.Get_Radar_Control_Type();
-                }
-
             }
         }
         break;
@@ -987,32 +976,54 @@ void Class_Chariot::Control_Image()
         //     Image.Set_Target_Image_Pitch_Angle(5.0f);
         //     Image.Set_Target_Image_Roll_Angle(-10.0f);
         // }
+    
 
-        if(DR16.Get_Keyboard_Key_F() == DR16_Key_Status_TRIG_FREE_PRESSED)
+        switch (Gimbal.Get_Launch_Mode())
         {
-            if(Swtich_Roll == 0){
-                Image.Set_Target_Image_Roll_Angle(-170.0f);
-                Swtich_Roll = 1;
+        case Launch_Disable:
+        {
+            // 切换雷达辅助模式
+            if (DR16.Get_Keyboard_Key_F() == DR16_Key_Status_TRIG_FREE_PRESSED)
+            {
+                if (MiniPC.Get_Radar_Control_Type() == Radar_Control_Type_Person)
+                    MiniPC.Set_Radar_Control_Type(Radar_Control_Type_UWB);
+                else
+                    MiniPC.Set_Radar_Control_Type(Radar_Control_Type_Person);
+
+                UI_Radar_Control_Type = MiniPC.Get_Radar_Control_Type();
             }
-            else{
-                Image.Set_Target_Image_Roll_Angle(-10.0f);
-                Swtich_Roll = 0;
+        }
+        break;
+        case Launch_Enable:
+        {
+            if (DR16.Get_Keyboard_Key_F() == DR16_Key_Status_TRIG_FREE_PRESSED)
+            {
+                if (Swtich_Roll == 0)
+                {
+                    Image.Set_Target_Image_Roll_Angle(-170.0f);
+                    Swtich_Roll = 1;
+                }
+                else
+                {
+                    Image.Set_Target_Image_Roll_Angle(-10.0f);
+                    Swtich_Roll = 0;
+                }
+            }
+            if (DR16.Get_Keyboard_Key_V() == DR16_Key_Status_PRESSED)
+            {
+                K = 0.001f;
+            }
+            else if (DR16.Get_Keyboard_Key_B() == DR16_Key_Status_PRESSED)
+            {
+                K = -0.001f;
+            }
+            else
+            {
+                K = 0.0f;
             }
         }
-
-        if(DR16.Get_Keyboard_Key_V() == DR16_Key_Status_PRESSED)
-        {
-            K = 0.001f;
+        break;
         }
-        else if(DR16.Get_Keyboard_Key_B() == DR16_Key_Status_PRESSED)
-        {
-            K= -0.001f;
-        }
-        else
-        {
-            K = 0.0f;
-        }
-
         tmp_image_pitch = Image.Get_Target_Image_Pitch_Angle();
         tmp_image_pitch += DR16.Get_Mouse_Z() * DR16_Mouse_Pitch_Angle_Resolution * 4.0f;
 
@@ -1265,6 +1276,7 @@ void Class_Chariot::Control_Booster()
 }
 #endif
 #ifdef CHASSIS
+float Uwb_pos_y = 1.1f,Uwb_pos_x = 6.43f;
 void Class_Chariot::CAN_Chassis_Tx_Gimbal_Callback()
 {
     //发送数据给云台
@@ -1275,6 +1287,8 @@ void Class_Chariot::CAN_Chassis_Tx_Gimbal_Callback()
     shoot_speed = (int16_t)(Referee.Get_Shoot_Speed() * 1000.0f);
     Pos_X = (int16_t)(Referee.Get_Location_X() * 1000.0f);
     Pos_Y = (int16_t)(Referee.Get_Location_Y() * 1000.0f);
+    // Pos_X = (int16_t)(Uwb_pos_x * 1000.0f);
+    // Pos_Y = (int16_t)(Uwb_pos_y * 1000.0f);
     memcpy(CAN2_Chassis_Tx_Gimbal_Data,&robot_id,sizeof(uint8_t));
     memcpy(CAN2_Chassis_Tx_Gimbal_Data + 1,&game_state,sizeof(uint8_t));
     memcpy(CAN2_Chassis_Tx_Gimbal_Data + 2, &shoot_speed, sizeof(int16_t));
