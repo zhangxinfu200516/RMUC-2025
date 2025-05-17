@@ -220,8 +220,8 @@ void Class_Booster::Init()
     FSM_Bullet_Velocity.Init(3, 0);
 
     //拨弹盘电机(需要从新调更新参数)DJI_motor_3508 0X201
-    Motor_Driver.PID_Angle.Init(80.0f, 0.8f, 1.0f, 0.0f, 5.0f * PI, 5.0f * PI);
-    Motor_Driver.PID_Omega.Init(3000.0f, 40.0f, 0.0f, 0.0f, Motor_Driver.Get_Output_Max(), Motor_Driver.Get_Output_Max());
+    Motor_Driver.PID_Angle.Init(200.0f, 10.0f, 1.0f, 0.0f, 0.0f,0.0f);
+    Motor_Driver.PID_Omega.Init(3000.0f, 40.0f, 0.0f, 0.0f, 16384.0f,  16384.0f);
     Motor_Driver.Init(&hcan2, DJI_Motor_ID_0x207, DJI_Motor_Control_Method_OMEGA,50.895f);
 
     //4*摩擦轮初始化
