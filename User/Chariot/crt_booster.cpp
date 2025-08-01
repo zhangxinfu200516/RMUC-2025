@@ -250,7 +250,7 @@ void Class_Booster::Output()
     //  {
     //      Set_Booster_Control_Type(Booster_Control_Type_CEASEFIRE);
     //  }
-
+    
     switch (Booster_Control_Type)
     {
     case (Booster_Control_Type_DISABLE):
@@ -260,6 +260,8 @@ void Class_Booster::Output()
         Motor_Driver.PID_Angle.Set_Integral_Error(0.0f);
         Motor_Driver.PID_Omega.Set_Integral_Error(0.0f);
         Motor_Driver.Set_Out(0.0f);
+
+        Drvier_Angle = Motor_Driver.Get_Now_Radian();
 
         for (auto i = 0; i < 4; i++)
         {
@@ -274,7 +276,7 @@ void Class_Booster::Output()
     case (Booster_Control_Type_CEASEFIRE):
     {
         Motor_Driver.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        // Motor_Driver.Set_Target_Angle(Motor_Driver.Get_Now_Angle());
+        Motor_Driver.Set_Target_Radian(Drvier_Angle);
 
         for (auto i = 0; i < 4; i++)
         {
@@ -462,8 +464,7 @@ int16_t Test_Fric1_Speed,Test_Fric2_Speed,Test_Fric3_Speed,Test_Fric4_Speed;
 void Class_Booster::TIM_Calculate_PeriodElapsedCallback()
 {
 
-    // 无需裁判系统的热量控制计算
-    // FSM_Heat_Detect.Reload_TIM_Status_PeriodElapsedCallback();
+    
     // 卡弹处理
     FSM_Antijamming.Reload_TIM_Status_PeriodElapsedCallback();
     TIM_Adjust_Bullet_Velocity_PeriodElapsedCallback();

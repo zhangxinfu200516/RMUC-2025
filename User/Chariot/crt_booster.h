@@ -165,8 +165,8 @@ protected:
     Enum_Booster_Control_Type Booster_Control_Type = Booster_Control_Type_CEASEFIRE;
     Enum_Friction_Control_Type Friction_Control_Type = Friction_Control_Type_DISABLE;
     //摩擦轮角速度
-    int16_t Fric_High_Rpm = 4975;
-    int16_t Fric_Low_Rpm = 4825;//
+    int16_t Fric_High_Rpm = 5015;//4975;
+    int16_t Fric_Low_Rpm = 3105;//4825;
     int16_t Fric_Transform_Rpm = -140;
     //子弹实际速度
     float Referee_Bullet_Velocity = 0.0f; 
