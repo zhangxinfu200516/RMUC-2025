@@ -657,10 +657,9 @@ void Class_Chariot::Control_Gimbal()
         break;
         }
         // 自瞄模式逻辑
-        if (DR16.Get_Left_Switch() == DR16_Switch_Status_DOWN) // 左下自瞄
+        if (DR16.Get_Left_Switch() == DR16_Switch_Status_DOWN) // 左下部署
         {
-            Gimbal.Set_Gimbal_Control_Type(Gimbal_Control_Type_MINIPC);
-            Gimbal.MiniPC->Set_MiniPC_Type(MiniPC_Type_Nomal);
+            Gimbal.Set_Gimbal_Control_Type(Gimbal_Control_Type_NORMAL);
 						Gimbal.Set_Launch_Mode(Launch_Enable);
         }
         else // 非自瞄模式
@@ -700,6 +699,15 @@ void Class_Chariot::Control_Gimbal()
                 Gimbal.Set_Target_Yaw_Angle(tmp_gimbal_yaw_imu);
             }
             Gimbal.Set_Gimbal_Control_Type(Gimbal_Control_Type_NORMAL);
+
+            // 长按右键  开启自瞄
+            if (DR16.Get_Mouse_Right_Key() == DR16_Key_Status_PRESSED && MiniPC.Get_MiniPC_Status() == MiniPC_Status_ENABLE)
+            {
+                //Gimbal.Set_Target_Yaw_Encoder_Angle(MiniPC.Get_Rx_Yaw_Angle() + Gimbal.Get_Transfrom_Yaw_Encoder_Angle());
+                Gimbal.Set_Target_Pitch_Angle(MiniPC.Get_Rx_Pitch_Angle() + Gimbal.Get_Transfrom_Pitch_IMU_Angle());
+                //Gimbal.Set_Target_Yaw_Angle(MiniPC.Get_Rx_Yaw_Angle());
+                Gimbal.Set_Gimbal_Control_Type(Gimbal_Control_Type_MINIPC);
+            }
         }
         break;
         case Launch_Enable:
@@ -725,6 +733,7 @@ void Class_Chariot::Control_Gimbal()
                 tmp_gimbal_pitch += True_Mouse_Y * DR16_Mouse_Pitch_Angle_Resolution;
                 Gimbal.Set_Target_Pitch_Angle(tmp_gimbal_pitch);
             }
+            #ifdef OLD
             // 长按右键  开启自瞄
             if (DR16.Get_Mouse_Right_Key() == DR16_Key_Status_PRESSED && MiniPC.Get_Radar_Enable_Status() == 1)
             {
@@ -734,6 +743,7 @@ void Class_Chariot::Control_Gimbal()
                 Gimbal.Set_Target_Yaw_Angle(Gimbal.Get_Target_Yaw_Encoder_Angle() - tmp_yaw_offest);
                 Gimbal.Set_Gimbal_Control_Type(Gimbal_Control_Type_MINIPC);
             }
+            #endif
             if (DR16.Get_Keyboard_Key_Shift() == DR16_Key_Status_PRESSED)
             {
                 float transform_yaw_offest_mode2 = 0.0f, transform_pitch_offest_mode2 = 0.0f;
@@ -766,12 +776,12 @@ void Class_Chariot::Control_Gimbal()
             //
             if(DR16.Get_Keyboard_Key_C() == DR16_Key_Status_TRIG_FREE_PRESSED)
             {
-                Gimbal.Set_Launch_Mode(Launch_Disable);
-                Gimbal.Set_Target_Pitch_Angle(-4.5f);
-                Image.Set_Target_Image_Roll_Angle(-10.0f);
-                Image.Set_Target_Image_Pitch_Angle(5.0f);
-                Swtich_Pitch = 0;
-                Swtich_Roll = 0;
+                 Gimbal.Set_Launch_Mode(Launch_Disable);
+                 Gimbal.Set_Target_Pitch_Angle(0.0f);
+                 Image.Set_Target_Image_Roll_Angle(90.0f);
+                 Image.Set_Target_Image_Pitch_Angle(0.5f);
+                 Swtich_Pitch = 0;
+                 Swtich_Roll = 0;
             }
             Gimbal.Set_Gimbal_Control_Type(Gimbal_Control_Type_NORMAL);
             
@@ -938,12 +948,12 @@ void Class_Chariot::Control_Image()
         {
             if (Swtich_Roll == 0)
             {
-                Image.Set_Target_Image_Roll_Angle(-173.0f);
+                Image.Set_Target_Image_Roll_Angle(90.0f);
                 Swtich_Roll = 1;
             }
             else
             {
-                Image.Set_Target_Image_Roll_Angle(-10.0f);
+                Image.Set_Target_Image_Roll_Angle(0.0f);
                 Swtich_Roll = 0;
             }
         }
@@ -967,7 +977,7 @@ void Class_Chariot::Control_Image()
         tmp_image_roll += -K*DR16_Mouse_Pitch_Angle_Resolution;
 
         Math_Constrain(&tmp_image_pitch, 0.0f, 48.0f);
-        Math_Constrain(&tmp_image_roll, -180.0f, 0.0f);
+        Math_Constrain(&tmp_image_roll,0.0f, 100.0f);
         Image.Set_Target_Image_Pitch_Angle(tmp_image_pitch);
         Image.Set_Target_Image_Roll_Angle(tmp_image_roll);
     }

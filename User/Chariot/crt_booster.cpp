@@ -141,7 +141,8 @@ void Class_FSM_Antijamming::Reload_TIM_Status_PeriodElapsedCallback()
         {
             //卡弹反应状态->准备卡弹处理
             Booster->Motor_Driver.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-            Booster->Drvier_Angle = Booster->Motor_Driver.Get_Now_Radian() + PI / 9.0f; //回退20度
+            original_angle = Booster->Motor_Driver.Get_Now_Radian();
+            Booster->Drvier_Angle = original_angle + PI / 9.0f; //回退20度
             Booster->Motor_Driver.Set_Target_Radian(Booster->Drvier_Angle);
             Set_Status(3);
         }
@@ -152,8 +153,9 @@ void Class_FSM_Antijamming::Reload_TIM_Status_PeriodElapsedCallback()
 
             if (Status[Now_Status_Serial].Time >= 100)
             {
-                //Booster->Drvier_Angle = Booster->Motor_Driver.Get_Now_Radian() - PI / 9.0f; //前进20度
-                Booster->Drvier_Angle = Booster->Drvier_Angle - PI / 9.0f; //前进20度
+                // Booster->Drvier_Angle = Booster->Motor_Driver.Get_Now_Radian() - PI / 9.0f; //前进20度
+                //Booster->Drvier_Angle = Booster->Drvier_Angle - PI / 9.0f; //前进20度
+                Booster->Drvier_Angle = original_angle;
                 Booster->Motor_Driver.Set_Target_Radian(Booster->Drvier_Angle);
                 Set_Status(4);
             }
@@ -165,13 +167,45 @@ void Class_FSM_Antijamming::Reload_TIM_Status_PeriodElapsedCallback()
         break;
         case (4):
         {
-            if(Status[Now_Status_Serial].Time >= 50)
-			{
-				Set_Status(0);
+//            if(Status[Now_Status_Serial].Time >= 50)
+//			{
+//				Set_Status(0);
+//			}
+					static uint8_t Torque_tim_cnt1 = 0;
+					if((abs(Booster->Motor_Driver.Get_Now_Torque()) < 0.3f*Booster->Driver_Torque_Threshold))
+					{
+						Torque_tim_cnt1++;
+							if(Torque_tim_cnt1 > 50)
+							{
+								Set_Status(0);
+								Torque_tim_cnt1 = 0;
+							}
+					}
+					else
+					{
+						Torque_tim_cnt1 = 0;
+						//Torque_tim_cnt = Status[Now_Status_Serial].Time;
+					}
+					
+					static uint8_t Torque_tim_cnt2 = 0;
+					if((abs(Booster->Motor_Driver.Get_Now_Torque()) > Booster->Driver_Torque_Threshold))
+					{
+						Torque_tim_cnt2++;
+							if(Torque_tim_cnt2 > 50)
+							{
+								Set_Status(2);
+								Torque_tim_cnt2 = 0;
+							}
+					}
+					else
+					{
+						Torque_tim_cnt2 = 0;
+						//Torque_tim_cnt = Status[Now_Status_Serial].Time;
+					}
+        
+        }
+				break;
 			}
-        }
-        break;
-        }
 }
     
 
@@ -220,22 +254,22 @@ void Class_Booster::Init()
     FSM_Bullet_Velocity.Init(3, 0);
 
     //拨弹盘电机(需要从新调更新参数)DJI_motor_3508 0X201
-    Motor_Driver.PID_Angle.Init(200.0f, 10.0f, 1.0f, 0.0f, 0.0f,0.0f);
-    Motor_Driver.PID_Omega.Init(3000.0f, 40.0f, 0.0f, 0.0f, 16384.0f,  16384.0f);
+    Motor_Driver.PID_Angle.Init(100.0f, 5.0f, 4.0f, 0.0f, 0.0f,0.0f);
+    Motor_Driver.PID_Omega.Init(3000.0f, 40.0f, 0.0f, 0.0f, 14000.0f,  14000.0f);
     Motor_Driver.Init(&hcan2, DJI_Motor_ID_0x207, DJI_Motor_Control_Method_OMEGA,50.895f);
 
     //4*摩擦轮初始化
     Fric[0].Init(&hcan1, DJI_Motor_ID_0x201, DJI_Motor_Control_Method_OMEGA, 1.0f);
-    Fric[0].PID_Omega.Init(10.0f, 0.05f, 0.0f, 0.0f, 2000.0f,11000.0f);
+    Fric[0].PID_Omega.Init(10.0f, 0.05f, 0.0f, 0.0f, 2000.0f,13000.0f);
 
     Fric[1].Init(&hcan1, DJI_Motor_ID_0x202, DJI_Motor_Control_Method_OMEGA, 1.0f);
-    Fric[1].PID_Omega.Init(10.0f, 0.05f, 0.0f, 0.0f, 2000.0f,11000.0f);
+    Fric[1].PID_Omega.Init(10.0f, 0.05f, 0.0f, 0.0f, 2000.0f,13000.0f);
 
     Fric[2].Init(&hcan1, DJI_Motor_ID_0x203, DJI_Motor_Control_Method_OMEGA, 1.0f);
-    Fric[2].PID_Omega.Init(10.0f, 0.05f, 0.0f, 0.0f, 2000.0f,11000.0f);
+    Fric[2].PID_Omega.Init(10.0f, 0.05f, 0.0f, 0.0f, 2000.0f,13000.0f);
 
     Fric[3].Init(&hcan1, DJI_Motor_ID_0x204, DJI_Motor_Control_Method_OMEGA, 1.0f);
-    Fric[3].PID_Omega.Init(10.0f, 0.05f, 0.0f, 0.0f, 2000.0f,11000.0f);
+    Fric[3].PID_Omega.Init(10.0f, 0.05f, 0.0f, 0.0f, 2000.0f,13000.0f);
 }
 
 /**
@@ -343,10 +377,10 @@ void Class_Booster::Output()
     // 控制摩擦轮
     if (Friction_Control_Type != Friction_Control_Type_DISABLE)
     {
-        Fric[0].Set_Target_Omega_Rpm((Fric_High_Rpm + Fric_Transform_Rpm));
-        Fric[1].Set_Target_Omega_Rpm(-(Fric_High_Rpm + Fric_Transform_Rpm));
-        Fric[2].Set_Target_Omega_Rpm(-(Fric_Low_Rpm + Fric_Transform_Rpm));
-        Fric[3].Set_Target_Omega_Rpm((Fric_Low_Rpm + Fric_Transform_Rpm));
+        Fric[0].Set_Target_Omega_Rpm(-(Fric_High_Rpm + Fric_Transform_Rpm));
+        Fric[1].Set_Target_Omega_Rpm((Fric_High_Rpm + Fric_Transform_Rpm));
+        Fric[2].Set_Target_Omega_Rpm((Fric_Low_Rpm + Fric_Transform_Rpm));
+        Fric[3].Set_Target_Omega_Rpm(-(Fric_Low_Rpm + Fric_Transform_Rpm));
     }
     else
     {
@@ -380,13 +414,13 @@ void Class_Booster::TIM_Adjust_Bullet_Velocity_PeriodElapsedCallback()
                 {
                     Fric_Transform_Rpm -= (int16_t)(300.0f * fabs(Referee_Bullet_Velocity - 16.0f));
                 }
-                else if (Referee_Bullet_Velocity >= 15.9f && Referee_Bullet_Velocity < 16.0f)
+                else if (Referee_Bullet_Velocity >= 15.85f && Referee_Bullet_Velocity < 16.0f)
                 {
-                    Fric_Transform_Rpm -= (int16_t)(100.0f * fabs(Referee_Bullet_Velocity - 15.9f));
+                    Fric_Transform_Rpm -= (int16_t)(100.0f * fabs(Referee_Bullet_Velocity - 15.85f));
                 }
-                else if (Referee_Bullet_Velocity <= 15.75f)
+                else if (Referee_Bullet_Velocity <= 15.60f)
                 {
-                    Fric_Transform_Rpm += (int16_t)(100.0f * fabs(Referee_Bullet_Velocity - 15.75f));
+                    Fric_Transform_Rpm += (int16_t)(100.0f * fabs(Referee_Bullet_Velocity - 15.65f));
                 }
             }
         }

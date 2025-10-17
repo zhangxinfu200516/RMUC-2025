@@ -387,9 +387,10 @@ void Task1ms_TIM5_Callback()
         #ifdef GIMBAL
         #ifdef USE_DR16
 
+        
         chariot.FSM_Alive_Control.Reload_TIM_Status_PeriodElapsedCallback();
         chariot.TIM_Unline_Protect_PeriodElapsedCallback();
-        
+       
         #elif defined(USE_VT13)
 
         chariot.FSM_Alive_Control_VT13.Reload_TIM_Status_PeriodElapsedCallback();

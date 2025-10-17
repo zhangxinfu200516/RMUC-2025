@@ -3,7 +3,7 @@
     "target": "infantry",
     "toolchain": "AC6",
     "toolchainLocation": "D:\\Keil_v5\\ARM\\ARMCLANG",
-    "toolchainCfgFile": "c:\\Users\\zxf\\.vscode\\extensions\\cl.eide-3.23.12\\res\\data\\models/arm.v6.model.json",
+    "toolchainCfgFile": "c:\\Users\\zxf\\.vscode\\extensions\\cl.eide-3.26.1\\res\\data\\models/arm.v6.model.json",
     "buildMode": "fast|multhread",
     "showRepathOnLog": true,
     "threadNum": 16,
@@ -29,6 +29,7 @@
         "../User/Middleware/Algorithm",
         "../User/Middleware/Driver",
         "../User/Task",
+        ".cmsis/include",
         "RTE/_infantry"
     ],
     "libDirs": [],
@@ -91,6 +92,7 @@
         "../User/Device/dvc_boardc_ist8310.cpp",
         "../User/Device/dvc_buzzer.cpp",
         "../User/Device/dvc_djimotor.cpp",
+        "../User/Device/dvc_dmimu.cpp",
         "../User/Device/dvc_dmmotor.cpp",
         "../User/Device/dvc_dr16.cpp",
         "../User/Device/dvc_dwt.cpp",
@@ -131,16 +133,29 @@
     "sourceParams": {},
     "options": {
         "version": 3,
-        "beforeBuildTasks": [],
         "afterBuildTasks": [
             {
                 "name": "axf to elf",
                 "command": "axf2elf -d \"${ToolchainRoot}\" -i \"${OutDir}/${ProjectName}.axf\" -o \"${OutDir}/${ProjectName}.elf\" > \"${OutDir}/axf2elf.log\""
             }
         ],
+        "asm-compiler": {
+            "$use": "asm-auto",
+            "misc-controls": ""
+        },
+        "beforeBuildTasks": [],
+        "c/cpp-compiler": {
+            "language-c": "c99",
+            "language-cpp": "c++11",
+            "link-time-optimization": false,
+            "one-elf-section-per-function": true,
+            "optimization": "level-0",
+            "short-enums#wchar": true,
+            "warnings": "no-warnings"
+        },
         "global": {
-            "use-microLIB": false,
             "output-debug-info": "enable",
+            "use-microLIB": false,
             "microcontroller-cpu": "cortex-m4-sp",
             "microcontroller-fpu": "cortex-m4-sp",
             "microcontroller-float": "cortex-m4-sp",
@@ -148,24 +163,15 @@
             "$clang-arch-extensions": "",
             "$armlink-arch-extensions": ""
         },
-        "c/cpp-compiler": {
-            "optimization": "level-0",
-            "language-c": "c99",
-            "language-cpp": "c++11",
-            "link-time-optimization": false,
-            "one-elf-section-per-function": true,
-            "short-enums#wchar": true,
-            "warnings": "no-warnings"
-        },
-        "asm-compiler": {
-            "$use": "asm-auto"
-        },
         "linker": {
-            "output-format": "elf",
+            "$outputTaskExcludes": [
+                ".bin"
+            ],
             "misc-controls": "--diag_suppress=L6329",
-            "xo-base": "",
+            "output-format": "elf",
             "ro-base": "",
             "rw-base": "",
+            "xo-base": "",
             "link-scatter": [
                 "d:/Users_RM/hero/M51-Gimbal/MDK-ARM/infantry/infantry.sct"
             ]
@@ -190,7 +196,7 @@
         "SYS_PathSep": ";",
         "SYS_PathSeparator": ";",
         "SYS_EOL": "\r\n",
-        "EIDE_BUILDER_DIR": "c:\\Users\\zxf\\.vscode\\extensions\\cl.eide-3.23.12\\res\\tools\\win32\\unify_builder",
+        "EIDE_BUILDER_DIR": "c:\\Users\\zxf\\.vscode\\extensions\\cl.eide-3.26.1\\res\\tools\\win32\\unify_builder",
         "EIDE_BINARIES_VER": "12.1.1",
         "EIDE_MSYS": "C:\\Users\\zxf\\.eide\\bin\\builder\\msys\\bin",
         "EIDE_PY3_CMD": "C:\\Users\\zxf\\.eide\\bin\\python36\\python3.exe",

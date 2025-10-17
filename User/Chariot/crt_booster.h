@@ -78,7 +78,7 @@ class Class_FSM_Antijamming : public Class_FSM
 {
 public:
     Class_Booster *Booster;
-
+    float original_angle; // 在类中作为成员变量
     void Reload_TIM_Status_PeriodElapsedCallback();
 };
 //摩擦轮电机类
@@ -116,6 +116,7 @@ public:
 
     //4*摩擦轮
     Class_Fric_Motor Fric[4];
+    
     //初始化
     void Init();
 
@@ -150,7 +151,7 @@ protected:
     //摩擦轮单次判定发弹阈值, 超出被认为发射子弹
     uint16_t Friction_Torque_Threshold = 3300;
     //摩擦轮速度判定发弹阈值, 超出则说明已经开机
-    float Friction_Omega_Threshold = 4500;
+    float Friction_Omega_Threshold = 3000;
 
     //内部变量
 
@@ -165,9 +166,9 @@ protected:
     Enum_Booster_Control_Type Booster_Control_Type = Booster_Control_Type_CEASEFIRE;
     Enum_Friction_Control_Type Friction_Control_Type = Friction_Control_Type_DISABLE;
     //摩擦轮角速度
-    int16_t Fric_High_Rpm = 5015;//4975;
-    int16_t Fric_Low_Rpm = 3105;//4825;
-    int16_t Fric_Transform_Rpm = -140;
+    int16_t Fric_High_Rpm = 4975;//5015;//4975;
+    int16_t Fric_Low_Rpm = 3975;//3105;//4825;
+    int16_t Fric_Transform_Rpm = 185;
     //子弹实际速度
     float Referee_Bullet_Velocity = 0.0f; 
     float Pre_Referee_Bullet_Velocity = 0.0f;
